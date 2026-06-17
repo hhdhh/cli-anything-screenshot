@@ -95,21 +95,21 @@ def capture():
 
 
 @capture.command("full")
-@click.option("--output", "-o", type=click.Path(), default=None)
+@click.option("--output", "-o", "output_path", type=click.Path(), default=None)
 @click.option("--display", "-D", type=int, default=None)
 @click.option("--cursor/--no-cursor", default=None)
 @click.option("--sounds/--no-sounds", default=None)
 @click.option("--format", "format_", type=click.Choice(VALID_FORMATS), default=None)
 @click.pass_context
 @handle_error
-def capture_full_cmd(ctx, output, display, cursor, sounds, format_):
+def capture_full_cmd(ctx, output_path, display, cursor, sounds, format_):
     """Capture the full screen (or a specific display)."""
     cfg = load_config(ctx.obj.get("config_file"))
     fmt = format_ or cfg["default_format"]
     cur = cursor if cursor is not None else cfg["include_cursor"]
     snd = sounds if sounds is not None else cfg["play_sounds"]
     meta = capture_full(
-        output_path=output,
+        output_path=output_path,
         display=display,
         include_cursor=cur,
         play_sounds=snd,
@@ -125,17 +125,17 @@ def capture_full_cmd(ctx, output, display, cursor, sounds, format_):
 @click.option("-y", "y", type=int, required=True)
 @click.option("-w", "width", type=int, required=True)
 @click.option("-h", "height", type=int, required=True)
-@click.option("--output", "-o", type=click.Path(), default=None)
+@click.option("--output", "-o", "output_path", type=click.Path(), default=None)
 @click.option("--sounds/--no-sounds", default=None)
 @click.option("--format", "format_", type=click.Choice(VALID_FORMATS), default=None)
 @click.pass_context
 @handle_error
-def capture_region_cmd(ctx, x, y, width, height, output, sounds, format_):
+def capture_region_cmd(ctx, x, y, width, height, output_path, sounds, format_):
     """Capture a rectangular region."""
     cfg = load_config(ctx.obj.get("config_file"))
     meta = capture_region(
         x=x, y=y, width=width, height=height,
-        output_path=output,
+        output_path=output_path,
         play_sounds=(sounds if sounds is not None else cfg["play_sounds"]),
         format_=(format_ or cfg["default_format"]),
         config=cfg,
@@ -146,18 +146,18 @@ def capture_region_cmd(ctx, x, y, width, height, output, sounds, format_):
 
 @capture.command("window")
 @click.option("--id", "window_id", type=int, required=True, help="Window ID (use a system tool to find it)")
-@click.option("--output", "-o", type=click.Path(), default=None)
+@click.option("--output", "-o", "output_path", type=click.Path(), default=None)
 @click.option("--shadow/--no-shadow", default=None)
 @click.option("--sounds/--no-sounds", default=None)
 @click.option("--format", "format_", type=click.Choice(VALID_FORMATS), default=None)
 @click.pass_context
 @handle_error
-def capture_window_cmd(ctx, window_id, output, shadow, sounds, format_):
+def capture_window_cmd(ctx, window_id, output_path, shadow, sounds, format_):
     """Capture a specific window by ID."""
     cfg = load_config(ctx.obj.get("config_file"))
     meta = capture_window(
         window_id=window_id,
-        output_path=output,
+        output_path=output_path,
         capture_shadow=(shadow if shadow is not None else cfg["capture_shadow"]),
         play_sounds=(sounds if sounds is not None else cfg["play_sounds"]),
         format_=(format_ or cfg["default_format"]),
@@ -197,12 +197,12 @@ def windows_cmd(ctx):
 
 @cli.command("convert")
 @click.argument("input_path", type=click.Path(exists=True))
-@click.option("--output", "-o", type=click.Path(), default=None)
+@click.option("--output", "-o", "output_path", type=click.Path(), default=None)
 @click.option("--format", "target_format", type=click.Choice(VALID_FORMATS), required=True)
 @handle_error
-def convert_cmd(input_path, output, target_format):
+def convert_cmd(input_path, output_path, target_format):
     """Convert a screenshot to a different format."""
-    result = convert_image(input_path, output, target_format)
+    result = convert_image(input_path, output_path, target_format)
     output(result, f"Converted to {target_format}")
 
 
