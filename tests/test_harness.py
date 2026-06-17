@@ -244,7 +244,7 @@ def test_cli_config_set_coerces_bool():
 
 def test_cli_capture_full_reports_runtime_error():
     runner = CliRunner()
-    with patch.object(B, "capture_full", side_effect=RuntimeError("screencapture failed (rc=1): could not create image from display")):
+    with patch.object(C, "capture_full", side_effect=RuntimeError("screencapture failed (rc=1): could not create image from display")):
         result = runner.invoke(C.cli, ["capture", "full", "--output", "/tmp/x.png"])
     assert result.exit_code != 0
     assert "could not create image" in result.output
