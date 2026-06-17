@@ -47,8 +47,9 @@ screenshot-harness/
     utils/screencapture_backend.py  # wraps `screencapture` and `sips`
     utils/repl_skin.py           # vendored from cli-anything-plugin
   tests/
-    test_harness.py              # 19 tests, fully mocked
-    TEST.md                      # this doc
+    conftest.py                  # autouse: tmp_path + session isolation
+    test_harness.py              # 19 backend / session / CLI unit tests
+    test_e2e_smoke.py            # 9 e2e tests via CliRunner
   SKILL.md                       # you are here
   README.md
   setup.py
@@ -56,7 +57,13 @@ screenshot-harness/
 
 ## Testing
 
-`PYTHONPATH=. python3 -m pytest tests/ -v` — 19 passed, no real display required.
+`PYTHONPATH=. python3 -m pytest tests/ -v` — 28 passed, no real display required.
+
+The `conftest.py` autouse fixture pins `DEFAULT_SESSION_FILE` to a
+per-test tmp path and calls `session.reset_state()` between tests, so
+the CLI never tries to write under the user's real
+`~/.cli-anything-screenshot/` and counters do not leak between tests.
+CI runs the suite on macOS for Python 3.10 / 3.11 / 3.12.
 
 ## Limitations
 

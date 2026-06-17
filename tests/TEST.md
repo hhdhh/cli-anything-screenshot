@@ -2,9 +2,10 @@
 
 ## Coverage
 
-19 unit + integration tests covering the public surface of the harness.
-No real screen capture is performed; the `screencapture` and `sips` binaries
-are mocked.
+28 tests covering the public surface of the harness. No real screen
+capture is performed; the `screencapture` and `sips` binaries are
+mocked, and the Click group is exercised end-to-end via
+`click.testing.CliRunner`.
 
 ## Groups
 
@@ -15,16 +16,23 @@ are mocked.
 | Convert | 2 | `sips` invocation path, format validation |
 | Session | 2 | Record + load history, `clear_history` resets state |
 | CLI integration | 4 | `--help` shape, `--json` output, `config set` boolean coercion, error surfacing, unknown commands |
+| End-to-end smoke | 9 | Full Click group via `CliRunner`: capture writes a file, region emits JSON, session appends, convert uses sips, config round-trip, help shape, fallback for headless `displays` |
+| **Total** | **28** | |
 
 ## Running
 
 ```bash
 PYTHONPATH=. python3 -m pytest tests/ -v
+# 28 passed in ~0.1s
 ```
 
-All tests pass on macOS with Python 3.9. The harness itself requires 3.10+
-at runtime for PEP 604 union syntax in the vendored REPL skin, but the
-backend / session / CLI code is 3.9 compatible.
+The `tests/conftest.py` autouse fixture pins `DEFAULT_SESSION_FILE` to
+a per-test tmp path and calls `session.reset_state()` between tests,
+so the CLI never tries to write under the user's real
+`~/.cli-anything-screenshot/` and counters do not leak between tests.
+
+CI runs the suite on macOS for Python 3.10 / 3.11 / 3.12. Local runs
+on Python 3.9 also pass.
 
 ## Known limitations (intentional, not bugs)
 
